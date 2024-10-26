@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 const _ = require('lodash');
 const date = require(__dirname + "/date.js");
+const { generateDescription } = require('./text_generation.js');
 
 const app = express();
 
@@ -12,21 +13,20 @@ app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
-
+app.use(express.json());
 
 mongoose.connect('mongodb://localhost:27017/todolistDB',  { useUnifiedTopology: true, useNewUrlParser: true, useFindAndModify: false  });
 
 const itemScheme = mongoose.Schema({
   name: String,
+  description: String // Add description field
 });
 
 const Item = mongoose.model("Item",itemScheme);
 
 const item1 = new Item({name: "Welcome to your todolist!"});
-const item2 = new Item({name: "Hit the + button to add a new item."});
-const item3 = new Item({name: "<-- Hit this to delete an item."});
 
-const defautItems = [item1, item2, item3];
+const defautItems = [item1];
 
 const listSchema = {
   name: String,
@@ -60,8 +60,12 @@ app.post("/", function(req, res){
 
   const day = date.getDate();
   const itemName = req.body.newItem;
+  const itemDescription = req.body.description; // Capture description input
   const listName = req.body.list;
-  const item = new Item({name: itemName});
+  const item = new Item({
+    name: itemName,
+    description: itemDescription // Save description
+  });
 
   if(listName === day){
     item.save();
@@ -72,7 +76,6 @@ app.post("/", function(req, res){
       foundList.save();
     });
     res.redirect("/"+listName);
-
   }
  
 });
@@ -114,6 +117,21 @@ app.get('/:customListName', function(req, res){
       }
     }
   });
+});
+
+app.post('/generate-description', async (req, res) => {
+    const { itemName } = req.body;
+    if (!itemName) {
+        return res.status(400).send('Item name is required');
+    }
+
+    try {
+        const description = await generateDescription(itemName);
+        res.json({ description });
+    } catch (error) {
+        console.error('Error generating description:', error);
+        res.status(500).send(`Error generating description: ${error.message}`);
+    }
 });
 
 app.listen(3000, function() {

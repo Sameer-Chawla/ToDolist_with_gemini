@@ -1,7 +1,6 @@
 {
   "name": "todolist-v1",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,11 +8,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.18.3",
+    "@google/generative-ai": "^0.21.0",
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.5",
     "ejs": "^2.6.1",
-    "express": "^4.19.2",
-    "lodash": "^4.17.20",
-    "mongoose": "^5.11.9",
+    "express": "^4.21.1",
+    "lodash": "^4.17.21",
+    "mongoose": "^5.13.22",
     "nodemon": "^2.0.6"
-  }
+  },
+  "description": ""
 }
